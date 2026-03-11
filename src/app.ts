@@ -3,6 +3,7 @@ import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import {env} from './config/env'
+import prismaPlugin from "./plugins/prisma"
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -23,7 +24,7 @@ export const buildApp = async () => {
   })
 
   await app.register(helmet)
-
+  await app.register(prismaPlugin) //DB connection plugin
   await app.register(jwt, {
     secret: env.JWT_SECRET
   })
