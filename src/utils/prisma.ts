@@ -7,3 +7,8 @@ const adapter = new PrismaPg({
 })
 
 export const prisma = new PrismaClient({ adapter })
+
+/*
+ used by your running Node.js app
+ needs the full adapter to query the DB at runtime
+*/
