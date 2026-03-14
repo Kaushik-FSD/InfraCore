@@ -6,6 +6,7 @@ import {env} from './config/env'
 import prismaPlugin from "./plugins/prisma"
 import { authRoutes } from "./modules/auth/routes";
 import redisPlugin from './plugins/redis'
+import errorHandlerPlugin from "./plugins/errorHandler";
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -21,6 +22,7 @@ export const buildApp = async () => {
         },
     })
 
+  await app.register(errorHandlerPlugin)
   await app.register(cors, {
     origin: env.NODE_ENV === 'development' ? '*' : false, // Adjust for production
   })
