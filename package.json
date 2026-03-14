@@ -26,12 +26,18 @@
     "@fastify/jwt": "^10.0.0",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.3.1",
     "fastify": "^5.8.2",
     "fastify-plugin": "^5.1.0",
-    "pg": "^8.20.0"
+    "fastify-type-provider-zod": "^6.1.0",
+    "ioredis": "^5.10.0",
+    "pg": "^8.20.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
+    "@types/ioredis": "^4.28.10",
     "@types/node": "^25.4.0",
     "@types/pg": "^8.18.0",
     "nodemon": "^3.1.14",

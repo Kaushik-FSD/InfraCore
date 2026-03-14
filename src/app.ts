@@ -4,6 +4,8 @@ import cors from '@fastify/cors';
 import jwt from '@fastify/jwt';
 import {env} from './config/env'
 import prismaPlugin from "./plugins/prisma"
+import { authRoutes } from "./modules/auth/routes";
+import redisPlugin from './plugins/redis'
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -25,9 +27,12 @@ export const buildApp = async () => {
 
   await app.register(helmet)
   await app.register(prismaPlugin) //DB connection plugin
+  await app.register(redisPlugin) // Redis connection plugin
   await app.register(jwt, {
     secret: env.JWT_SECRET
   })
+
+  await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
 
   app.get('/health', async (request, reply) => {
     return { status: 'ok', timestamp: new Date().toISOString() }

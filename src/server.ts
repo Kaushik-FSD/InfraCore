@@ -3,7 +3,6 @@ import {env} from './config/env'
 
 const startServer = async () => {
     const app = await buildApp();
-
     try{
         await app.listen({ port: env.PORT, host: '0.0.0.0' })
         console.log(`InfraCore running on port ${env.PORT}`)
