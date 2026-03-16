@@ -7,6 +7,7 @@ import prismaPlugin from "./plugins/prisma"
 import { authRoutes } from "./modules/auth/routes";
 import redisPlugin from './plugins/redis'
 import errorHandlerPlugin from "./plugins/errorHandler";
+import authenticatePlugin from './plugins/authenticate'
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -34,10 +35,17 @@ export const buildApp = async () => {
     secret: env.JWT_SECRET
   })
 
+
+  await app.register(authenticatePlugin)
   await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
 
   app.get('/health', async (request, reply) => {
     return { status: 'ok', timestamp: new Date().toISOString() }
+  })
+
+  //auth protected route test
+  app.get('/protected', {preHandler: [app.authenticate]}, async (request, reply) => {
+    return { userId: request.authUser.userId }
   })
 
   return app;

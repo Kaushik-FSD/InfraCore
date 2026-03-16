@@ -1,10 +1,19 @@
 import { PrismaClient } from '@prisma/client'
 import Redis from 'ioredis'
+import { FastifyRequest, FastifyReply } from 'fastify'
 
 declare module 'fastify' {
   interface FastifyInstance {
     prisma: PrismaClient
     redis: Redis
+    authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
+  }
+
+  interface FastifyRequest {
+    authUser : {
+      userId: string
+      email: string
+    }
   }
 }
 
