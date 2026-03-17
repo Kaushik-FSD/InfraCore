@@ -8,6 +8,7 @@ import { authRoutes } from "./modules/auth/routes";
 import redisPlugin from './plugins/redis'
 import errorHandlerPlugin from "./plugins/errorHandler";
 import authenticatePlugin from './plugins/authenticate'
+import { orgRoutes } from "./modules/orgs/routes";
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -38,12 +39,13 @@ export const buildApp = async () => {
 
   await app.register(authenticatePlugin)
   await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
-
+  await app.register(orgRoutes, { prefix: '/orgs' })
+  
   app.get('/health', async (request, reply) => {
     return { status: 'ok', timestamp: new Date().toISOString() }
   })
 
-  //auth protected route test
+  //auth protected route for test
   app.get('/protected', {preHandler: [app.authenticate]}, async (request, reply) => {
     return { userId: request.authUser.userId }
   })
