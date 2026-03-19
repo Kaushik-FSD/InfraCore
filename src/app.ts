@@ -9,6 +9,8 @@ import redisPlugin from './plugins/redis'
 import errorHandlerPlugin from "./plugins/errorHandler";
 import authenticatePlugin from './plugins/authenticate'
 import { orgRoutes } from "./modules/orgs/routes";
+import { apiKeyRoutes } from './modules/api-keys/routes'
+import apiKeyAuthPlugin from './plugins/apiKeyAuth'
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -38,9 +40,11 @@ export const buildApp = async () => {
 
 
   await app.register(authenticatePlugin)
+  await app.register(apiKeyAuthPlugin)
   await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
   await app.register(orgRoutes, { prefix: '/orgs' })
-  
+  await app.register(apiKeyRoutes, { prefix: '/orgs' })
+
   app.get('/health', async (request, reply) => {
     return { status: 'ok', timestamp: new Date().toISOString() }
   })

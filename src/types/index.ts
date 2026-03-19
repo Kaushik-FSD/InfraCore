@@ -7,12 +7,20 @@ declare module 'fastify' {
     prisma: PrismaClient
     redis: Redis
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
+    authenticateApiKey: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
   }
 
   interface FastifyRequest {
     authUser : {
       userId: string
       email: string
+    }
+
+    apiKeyOrg: {
+      orgId: string
+      keyId: string
+      permissions: string[]
+      rateLimit: number
     }
   }
 }
