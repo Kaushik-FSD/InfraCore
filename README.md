@@ -121,3 +121,28 @@ These are endpoints that Acme's SERVER calls automatically — not endpoints Ali
 ---
 
 Does the separation make sense now? JWT = human identity, API key = company/org identity.
+
+
+
+API KEY EXAMPLE:
+{
+    "id": "cmmyubayh0004nbxo7hrqux94",
+    "name": "Mobile App Key",
+    "key": "ic_live_3803CnAklb45x9CaSauuMTqnTzHkZdoO",
+    "keyPrefix": "ic_live",
+    "permissions": [
+        "read",
+        "write"
+    ],
+    "rateLimit": 1000,
+    "expiresAt": null,
+    "createdAt": "2026-03-20T11:53:07.385Z",
+    "message": "Store this key safely — it will never be shown again"
+}
+
+payload:
+{
+  "name": "Mobile App Key",
+  "permissions": ["read", "write"],
+  "rateLimit": 1000
+}

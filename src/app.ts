@@ -45,14 +45,14 @@ export const buildApp = async () => {
   await app.register(orgRoutes, { prefix: '/orgs' })
   await app.register(apiKeyRoutes, { prefix: '/orgs' })
 
-  app.get('/health', async (request, reply) => {
-    return { status: 'ok', timestamp: new Date().toISOString() }
-  })
+  // app.get('/health', async (request, reply) => {
+  //   return { status: 'ok', timestamp: new Date().toISOString() }
+  // })
 
-  //auth protected route for test
-  app.get('/protected', {preHandler: [app.authenticate]}, async (request, reply) => {
-    return { userId: request.authUser.userId }
-  })
+  // //auth protected route for test
+  // app.get('/protected', {preHandler: [app.authenticate]}, async (request, reply) => {
+  //   return { userId: request.authUser.userId }
+  // })
 
   return app;
 }

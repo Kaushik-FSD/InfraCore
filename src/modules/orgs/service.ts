@@ -43,7 +43,7 @@ export class OrgService {
     async getOrg(userId: string, orgId: string) {
         // Check user is a member of this org
         const membership = await prisma.orgMember.findUnique({
-        where: { userId_orgId: { userId, orgId } },
+            where: { userId_orgId: { userId, orgId } },
         })
 
         if (!membership) {
