@@ -8,6 +8,7 @@ declare module 'fastify' {
     redis: Redis
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
     authenticateApiKey: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
+    checkRateLimit: (request: FastifyRequest, reply: FastifyReply) => Promise<void>
   }
 
   interface FastifyRequest {

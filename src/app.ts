@@ -11,6 +11,7 @@ import authenticatePlugin from './plugins/authenticate'
 import { orgRoutes } from "./modules/orgs/routes";
 import { apiKeyRoutes } from './modules/api-keys/routes'
 import apiKeyAuthPlugin from './plugins/apiKeyAuth'
+import rateLimiterPlugin from './plugins/rateLimiter'
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -41,6 +42,7 @@ export const buildApp = async () => {
 
   await app.register(authenticatePlugin)
   await app.register(apiKeyAuthPlugin)
+  await app.register(rateLimiterPlugin)
   await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
   await app.register(orgRoutes, { prefix: '/orgs' })
   await app.register(apiKeyRoutes, { prefix: '/orgs' })
@@ -52,6 +54,16 @@ export const buildApp = async () => {
   // //auth protected route for test
   // app.get('/protected', {preHandler: [app.authenticate]}, async (request, reply) => {
   //   return { userId: request.authUser.userId }
+  // })
+
+  // Test rate limit route
+  // app.get('/test-rate-limit', {
+  //   preHandler: [app.authenticateApiKey, app.checkRateLimit]
+  // }, async (request) => {
+  //   return { 
+  //     message: 'Request successful',
+  //     org: request.apiKeyOrg 
+  //   }
   // })
 
   return app;
