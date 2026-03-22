@@ -277,16 +277,9 @@ npx prisma studio --config prisma/prisma.config.ts
 
 > ⚠️ InfraCore is a **backend architecture project**. There is no UI — all interaction is via REST API using Postman or cURL.
 
-| Endpoint | Description |
-|---|---|
-| `GET /health` | Server health check |
-| `GET /metrics` | Live server metrics (memory, CPU, uptime) |
-| `POST /auth/signup` | Create a new user account |
-| `POST /auth/login` | Authenticate and receive tokens |
-
 See **[API.md](./API.md)** for complete endpoint documentation with request/response examples for all 20+ endpoints.
 
-**Interactive Architecture Diagram:** [View Here](#) ← _deploy link_
+**Interactive Architecture Diagram:** [View Here](https://kaushik-fsd.github.io/InfraCore/) ← _deploy link_
 
 ---
 
