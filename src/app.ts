@@ -15,6 +15,7 @@ import rateLimiterPlugin from './plugins/rateLimiter'
 import { WebhookService } from "./modules/webhook/service";
 import { auditRoutes } from "./modules/audit/routes";
 import { observabilityRoutes } from "./modules/observability/routes";
+import { insightRoutes } from "./modules/insights/routes";
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -51,6 +52,7 @@ export const buildApp = async () => {
   await app.register(apiKeyRoutes, { prefix: '/orgs' })
   await app.register(auditRoutes, { prefix: '/orgs' })
   await app.register(observabilityRoutes)
+  await app.register(insightRoutes, { prefix: '/orgs' })
 
   // app.get('/health', async (request, reply) => {
   //   return { status: 'ok', timestamp: new Date().toISOString() }

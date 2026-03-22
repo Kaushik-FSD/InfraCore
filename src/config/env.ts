@@ -26,6 +26,9 @@ export const env = {
 
   // Redis
   REDIS_URL: requireEnv('REDIS_URL'),
+
+  //AI API KEY - GEMINI
+  GEMINI_API_KEY: requireEnv('GEMINI_API_KEY'),
 }
 
 // create a TypeScript type called Env that matches the structure (shape) of the env object.
