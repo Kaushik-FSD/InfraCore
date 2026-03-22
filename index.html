@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InfraCore — Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #6ee7b7;
+    --accent2: #818cf8;
+    --accent3: #f472b6;
+    --accent4: #fbbf24;
+    --text: #e2e8f0;
+    --muted: #64748b;
+    --card: #13131c;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .noise {
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* HEADER */
+  .header {
+    margin-bottom: 64px;
+  }
+
+  .tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: block;
+  }
+
+  h1 {
+    font-size: clamp(42px, 7vw, 72px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+  }
+
+  h1 span {
+    color: var(--accent);
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    font-weight: 400;
+    max-width: 500px;
+    line-height: 1.6;
+  }
+
+  /* SECTION */
+  .section {
+    margin-bottom: 56px;
+  }
+
+  .section-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* TECH STACK */
+  .stack-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+
+  .stack-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    transition: border-color 0.2s, transform 0.2s;
+    cursor: default;
+  }
+
+  .stack-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+
+  .stack-icon {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+
+  .stack-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .stack-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .stack-card.core { border-color: rgba(110,231,183,0.2); }
+  .stack-card.infra { border-color: rgba(129,140,248,0.2); }
+  .stack-card.obs { border-color: rgba(251,191,36,0.2); }
+
+  /* FLOW DIAGRAM */
+  .flow {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 36px;
+    overflow-x: auto;
+  }
+
+  .flow-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    min-width: 600px;
+  }
+
+  .flow-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+
+  .flow-node {
+    border-radius: 10px;
+    padding: 14px 20px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 13px;
+    white-space: nowrap;
+    position: relative;
+    flex-shrink: 0;
+  }
+
+  .flow-node.client {
+    background: rgba(110,231,183,0.1);
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+  }
+
+  .flow-node.api {
+    background: rgba(129,140,248,0.1);
+    border: 1.5px solid var(--accent2);
+    color: var(--accent2);
+  }
+
+  .flow-node.db {
+    background: rgba(244,114,182,0.1);
+    border: 1.5px solid var(--accent3);
+    color: var(--accent3);
+  }
+
+  .flow-node.queue {
+    background: rgba(251,191,36,0.1);
+    border: 1.5px solid var(--accent4);
+    color: var(--accent4);
+  }
+
+  .flow-node.worker {
+    background: rgba(251,191,36,0.08);
+    border: 1.5px dashed var(--accent4);
+    color: var(--accent4);
+  }
+
+  .flow-node.middleware {
+    background: rgba(129,140,248,0.07);
+    border: 1.5px solid rgba(129,140,248,0.4);
+    color: var(--accent2);
+    font-size: 11px;
+    padding: 10px 14px;
+  }
+
+  .arrow-down {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 28px;
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  .arrow-right {
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  .flow-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: center;
+    margin: 4px 0;
+  }
+
+  .middleware-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .services-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+  }
+
+  .service-node {
+    background: rgba(110,231,183,0.06);
+    border: 1px solid rgba(110,231,183,0.2);
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .service-node small {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--muted);
+    margin-top: 4px;
+    font-weight: 400;
+  }
+
+  .data-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .data-node {
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+
+  .data-node.postgres {
+    background: rgba(244,114,182,0.08);
+    border: 1.5px solid rgba(244,114,182,0.3);
+    color: var(--accent3);
+  }
+
+  .data-node.redis {
+    background: rgba(251,191,36,0.08);
+    border: 1.5px solid rgba(251,191,36,0.3);
+    color: var(--accent4);
+  }
+
+  .data-node-title {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  .data-node-items {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    line-height: 1.8;
+    text-align: left;
+  }
+
+  /* MODULES */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+  }
+
+  .module-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+
+  .module-card:hover {
+    border-color: rgba(110,231,183,0.4);
+  }
+
+  .module-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .module-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--border);
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .module-name {
+    font-weight: 700;
+    font-size: 15px;
+  }
+
+  .module-desc {
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 14px;
+  }
+
+  .module-endpoints {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .endpoint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: var(--border);
+    color: var(--muted);
+  }
+
+  .endpoint.post { color: #6ee7b7; }
+  .endpoint.get { color: #818cf8; }
+  .endpoint.delete { color: #f87171; }
+
+  /* MULTI-TENANCY */
+  .tenancy-visual {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+  }
+
+  .tenants-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .tenant-box {
+    border-radius: 10px;
+    padding: 16px;
+    border: 1px dashed;
+  }
+
+  .tenant-box.a {
+    border-color: rgba(110,231,183,0.4);
+    background: rgba(110,231,183,0.04);
+  }
+
+  .tenant-box.b {
+    border-color: rgba(129,140,248,0.4);
+    background: rgba(129,140,248,0.04);
+  }
+
+  .tenant-name {
+    font-weight: 700;
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+
+  .tenant-box.a .tenant-name { color: var(--accent); }
+  .tenant-box.b .tenant-name { color: var(--accent2); }
+
+  .tenant-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .tenancy-note {
+    background: var(--border);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-align: center;
+  }
+
+  /* WEBHOOK FLOW */
+  .webhook-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .webhook-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .step-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .step-dot {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--border);
+    border: 2px solid var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .step-connector {
+    width: 2px;
+    height: 32px;
+    background: var(--border);
+    margin: 4px 0;
+  }
+
+  .step-content {
+    padding-top: 6px;
+    padding-bottom: 24px;
+  }
+
+  .step-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .step-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.7;
+  }
+
+  /* BUILD ORDER */
+  .build-order {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .build-phase {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .phase-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--border);
+    width: 32px;
+    flex-shrink: 0;
+  }
+
+  .phase-info {}
+
+  .phase-name {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .phase-desc {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .phase-badge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+
+  .phase-badge.foundation { background: rgba(110,231,183,0.1); color: var(--accent); }
+  .phase-badge.core { background: rgba(129,140,248,0.1); color: var(--accent2); }
+  .phase-badge.advanced { background: rgba(244,114,182,0.1); color: var(--accent3); }
+  .phase-badge.ai { background: rgba(251,191,36,0.1); color: var(--accent4); }
+
+  @media (max-width: 600px) {
+    .services-row { grid-template-columns: repeat(2, 1fr); }
+    .tenants-container { grid-template-columns: 1fr; }
+    .data-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="noise"></div>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <span class="tag">Portfolio Project 01</span>
+    <h1>Infra<span>Core</span></h1>
+    <p class="subtitle">Production-ready multi-tenant SaaS backend platform. Architecture reference & build guide.</p>
+  </div>
+
+  <!-- TECH STACK -->
+  <div class="section">
+    <div class="section-title">Tech Stack</div>
+    <div class="stack-grid">
+      <div class="stack-card core">
+        <div class="stack-icon">⚡</div>
+        <div class="stack-name">Fastify</div>
+        <div class="stack-role">HTTP Framework</div>
+      </div>
+      <div class="stack-card core">
+        <div class="stack-icon">🔷</div>
+        <div class="stack-name">TypeScript</div>
+        <div class="stack-role">Language</div>
+      </div>
+      <div class="stack-card core">
+        <div class="stack-icon">🐘</div>
+        <div class="stack-name">PostgreSQL</div>
+        <div class="stack-role">Primary Database</div>
+      </div>
+      <div class="stack-card core">
+        <div class="stack-icon">🔺</div>
+        <div class="stack-name">Prisma ORM</div>
+        <div class="stack-role">DB Access Layer</div>
+      </div>
+      <div class="stack-card infra">
+        <div class="stack-icon">🔴</div>
+        <div class="stack-name">Redis</div>
+        <div class="stack-role">Cache + Rate Limit</div>
+      </div>
+      <div class="stack-card infra">
+        <div class="stack-icon">🐂</div>
+        <div class="stack-name">BullMQ</div>
+        <div class="stack-role">Job Queue</div>
+      </div>
+      <div class="stack-card infra">
+        <div class="stack-icon">🐳</div>
+        <div class="stack-name">Docker</div>
+        <div class="stack-role">Containerization</div>
+      </div>
+      <div class="stack-card obs">
+        <div class="stack-icon">📋</div>
+        <div class="stack-name">Pino</div>
+        <div class="stack-role">Structured Logging</div>
+      </div>
+      <div class="stack-card obs">
+        <div class="stack-icon">🤖</div>
+        <div class="stack-name">Claude API</div>
+        <div class="stack-role">AI Insights (Phase 4)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SYSTEM FLOW -->
+  <div class="section">
+    <div class="section-title">System Flow</div>
+    <div class="flow">
+      <div class="flow-diagram">
+
+        <div class="flow-row">
+          <div class="flow-node client">👤 Client / API Consumer</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="flow-label">HTTP Request</div>
+
+        <div class="flow-row">
+          <div class="flow-node api">⚡ Fastify API Server</div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="flow-label">passes through middleware</div>
+
+        <div class="flow-row">
+          <div class="middleware-row">
+            <div class="flow-node middleware">🔐 Auth (JWT / API Key)</div>
+            <div class="flow-node middleware">🚦 Rate Limiter (Redis)</div>
+            <div class="flow-node middleware">🔍 Request ID / Tracing</div>
+          </div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="flow-label">routes to service module</div>
+
+        <div class="services-row">
+          <div class="service-node">Auth<small>/auth/*</small></div>
+          <div class="service-node">Orgs<small>/orgs/*</small></div>
+          <div class="service-node">API Keys<small>/api-keys/*</small></div>
+          <div class="service-node">Webhooks<small>/webhooks/*</small></div>
+          <div class="service-node">Metrics<small>/metrics</small></div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="flow-label">reads / writes to data layer</div>
+
+        <div class="data-row">
+          <div class="data-node postgres">
+            <div class="data-node-title">🐘 PostgreSQL</div>
+            <div class="data-node-items">
+              users · organizations<br>
+              org_members · api_keys<br>
+              webhook_endpoints<br>
+              webhook_events · audit_logs
+            </div>
+          </div>
+          <div class="data-node redis">
+            <div class="data-node-title">🔴 Redis</div>
+            <div class="data-node-items">
+              rate limit counters<br>
+              token blacklist<br>
+              BullMQ job queues<br>
+              session cache
+            </div>
+          </div>
+        </div>
+        <div class="arrow-down">↓</div>
+        <div class="flow-label">async job processing</div>
+
+        <div class="flow-row">
+          <div class="flow-node worker">🐂 BullMQ Workers — webhook delivery · email · retry logic</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- MODULES -->
+  <div class="section">
+    <div class="section-title">Core Modules</div>
+    <div class="modules-grid">
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">01</span>
+          <span class="module-name">Auth Service</span>
+        </div>
+        <p class="module-desc">User signup, login, JWT access + refresh tokens, token revocation, session invalidation.</p>
+        <div class="module-endpoints">
+          <span class="endpoint post">POST /auth/signup</span>
+          <span class="endpoint post">POST /auth/login</span>
+          <span class="endpoint post">POST /auth/refresh</span>
+          <span class="endpoint post">POST /auth/logout</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">02</span>
+          <span class="module-name">Organization Service</span>
+        </div>
+        <p class="module-desc">Multi-tenancy core. Create orgs, invite members, assign RBAC roles (admin/member/viewer).</p>
+        <div class="module-endpoints">
+          <span class="endpoint post">POST /orgs</span>
+          <span class="endpoint get">GET /orgs/:id</span>
+          <span class="endpoint post">POST /orgs/:id/invite</span>
+          <span class="endpoint post">POST /orgs/:id/roles</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">03</span>
+          <span class="module-name">API Key Service</span>
+        </div>
+        <p class="module-desc">Generate and revoke API keys per org. Each key has scoped permissions, rate limits, and usage tracking.</p>
+        <div class="module-endpoints">
+          <span class="endpoint post">POST /api-keys</span>
+          <span class="endpoint get">GET /api-keys</span>
+          <span class="endpoint delete">DELETE /api-keys/:id</span>
+          <span class="endpoint get">GET /api-keys/:id/usage</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">04</span>
+          <span class="module-name">Webhook System</span>
+        </div>
+        <p class="module-desc">Register endpoints, sign payloads with HMAC, deliver events via BullMQ with retry + dead-letter queue.</p>
+        <div class="module-endpoints">
+          <span class="endpoint post">POST /webhooks/endpoints</span>
+          <span class="endpoint get">GET /webhooks/events</span>
+          <span class="endpoint post">POST /webhooks/test</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">05</span>
+          <span class="module-name">Audit Logs</span>
+        </div>
+        <p class="module-desc">Immutable log of every action per org. Who did what, when, from which IP. Foundation for AI insights.</p>
+        <div class="module-endpoints">
+          <span class="endpoint get">GET /audit-logs</span>
+          <span class="endpoint get">GET /audit-logs?userId=</span>
+          <span class="endpoint get">GET /audit-logs?action=</span>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <div class="module-header">
+          <span class="module-num">06</span>
+          <span class="module-name">AI Usage Insights</span>
+        </div>
+        <p class="module-desc">Natural language queries over org API usage data. Ask "why did my usage spike?" and get plain-English answers.</p>
+        <div class="module-endpoints">
+          <span class="endpoint post">POST /insights/query</span>
+          <span class="endpoint get">GET /insights/summary</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MULTI TENANCY -->
+  <div class="section">
+    <div class="section-title">Multi-Tenancy Model</div>
+    <div class="tenancy-visual">
+      <div class="tenants-container">
+        <div class="tenant-box a">
+          <div class="tenant-name">Tenant A — Acme Corp</div>
+          <div class="tenant-item">org_id: org_acme</div>
+          <div class="tenant-item">users: alice, bob</div>
+          <div class="tenant-item">api keys: key_abc, key_xyz</div>
+          <div class="tenant-item">webhook: acme.com/hooks</div>
+        </div>
+        <div class="tenant-box b">
+          <div class="tenant-name">Tenant B — BetaCo</div>
+          <div class="tenant-item">org_id: org_beta</div>
+          <div class="tenant-item">users: charlie, dan</div>
+          <div class="tenant-item">api keys: key_123</div>
+          <div class="tenant-item">webhook: betaco.io/events</div>
+        </div>
+      </div>
+      <div class="tenancy-note">
+        Same DB · Same server · Isolated by org_id on every query · Cannot see each other's data
+      </div>
+    </div>
+  </div>
+
+  <!-- WEBHOOK FLOW -->
+  <div class="section">
+    <div class="section-title">Webhook Delivery Flow</div>
+    <div class="flow">
+      <div class="webhook-steps">
+        <div class="webhook-step">
+          <div class="step-line">
+            <div class="step-dot">1</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Event Triggered</div>
+            <div class="step-desc">org.member_added · user.created · api_key.generated</div>
+          </div>
+        </div>
+        <div class="webhook-step">
+          <div class="step-line">
+            <div class="step-dot">2</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Event Persisted to DB</div>
+            <div class="step-desc">webhook_events table → status: pending</div>
+          </div>
+        </div>
+        <div class="webhook-step">
+          <div class="step-line">
+            <div class="step-dot">3</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Job Pushed to BullMQ</div>
+            <div class="step-desc">Redis queue → webhook-delivery queue</div>
+          </div>
+        </div>
+        <div class="webhook-step">
+          <div class="step-line">
+            <div class="step-dot">4</div>
+            <div class="step-connector"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Worker Delivers HTTP POST</div>
+            <div class="step-desc">HMAC-signed payload → customer's registered URL</div>
+          </div>
+        </div>
+        <div class="webhook-step">
+          <div class="step-line">
+            <div class="step-dot">5</div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Success or Retry</div>
+            <div class="step-desc">200 OK → mark delivered ✓ &nbsp;|&nbsp; fail → retry x3 with backoff → dead-letter queue</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BUILD ORDER -->
+  <div class="section">
+    <div class="section-title">Build Order</div>
+    <div class="build-order">
+      <div class="build-phase">
+        <div class="phase-num">01</div>
+        <div class="phase-info">
+          <div class="phase-name">Project Setup</div>
+          <div class="phase-desc">Fastify + TypeScript + Prisma + Docker + folder structure</div>
+        </div>
+        <span class="phase-badge foundation">Foundation</span>
+      </div>
+      <div class="build-phase">
+        <div class="phase-num">02</div>
+        <div class="phase-info">
+          <div class="phase-name">Auth + Organization + RBAC</div>
+          <div class="phase-desc">JWT · refresh tokens · orgs · invite · roles</div>
+        </div>
+        <span class="phase-badge foundation">Foundation</span>
+      </div>
+      <div class="build-phase">
+        <div class="phase-num">03</div>
+        <div class="phase-info">
+          <div class="phase-name">API Keys + Rate Limiting</div>
+          <div class="phase-desc">Key generation · scoped permissions · Redis rate limiter</div>
+        </div>
+        <span class="phase-badge core">Core</span>
+      </div>
+      <div class="build-phase">
+        <div class="phase-num">04</div>
+        <div class="phase-info">
+          <div class="phase-name">Webhook System + BullMQ Workers</div>
+          <div class="phase-desc">Event system · job queue · delivery · retry · dead-letter</div>
+        </div>
+        <span class="phase-badge core">Core</span>
+      </div>
+      <div class="build-phase">
+        <div class="phase-num">05</div>
+        <div class="phase-info">
+          <div class="phase-name">Audit Logs + Observability</div>
+          <div class="phase-desc">Pino logging · request IDs · metrics endpoint · structured logs</div>
+        </div>
+        <span class="phase-badge advanced">Advanced</span>
+      </div>
+      <div class="build-phase">
+        <div class="phase-num">06</div>
+        <div class="phase-info">
+          <div class="phase-name">AI Usage Insights</div>
+          <div class="phase-desc">Claude API · natural language queries over usage data</div>
+        </div>
+        <span class="phase-badge ai">AI Layer</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
