@@ -77,7 +77,7 @@ Client / API Consumer
                              └─────────────────────────┘
 ```
 
-> 📐 [View Interactive Architecture Diagram](#) ← _deploy link_
+> 📐 [https://kaushik-fsd.github.io/InfraCore/](#)
 
 ---
 
