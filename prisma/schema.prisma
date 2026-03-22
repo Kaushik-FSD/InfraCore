@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── USERS ───────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  orgMembers   OrgMember[]
+  auditLogs    AuditLog[]
+}
+
+// ─── ORGANIZATIONS ───────────────────────────────────────
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  slug      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  members          OrgMember[]
+  apiKeys          ApiKey[]
+  webhookEndpoints WebhookEndpoint[]
+  webhookEvents    WebhookEvent[]
+  auditLogs        AuditLog[]
+}
+
+// ─── ORG MEMBERS ─────────────────────────────────────────
+
+model OrgMember {
+  id        String   @id @default(cuid())
+  role      Role     @default(MEMBER)
+  joinedAt  DateTime @default(now())
+
+  // Relations
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, orgId])
+}
+
+enum Role {
+  ADMIN
+  MEMBER
+  VIEWER
+}
+
+// ─── API KEYS ─────────────────────────────────────────────
+
+model ApiKey {
+  id          String    @id @default(cuid())
+  name        String
+  keyHash     String    @unique
+  keyPrefix   String
+  permissions String[]
+  usageCount  Int       @default(0)
+  rateLimit   Int       @default(1000)
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  revokedAt   DateTime?
+
+  // Relations
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
+
+// ─── WEBHOOK ENDPOINTS ────────────────────────────────────
+
+model WebhookEndpoint {
+  id        String   @id @default(cuid())
+  url       String
+  secret    String
+  events    String[]
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  // Relations
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  deliveries WebhookEvent[]
+}
+
+// ─── WEBHOOK EVENTS ───────────────────────────────────────
+
+model WebhookEvent {
+  id          String              @id @default(cuid())
+  eventType   String
+  payload     Json
+  status      WebhookEventStatus  @default(PENDING)
+  attempts    Int                 @default(0)
+  deliveredAt DateTime?
+  createdAt   DateTime            @default(now())
+
+  // Relations
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+
+  endpointId String
+  endpoint   WebhookEndpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
+}
+
+enum WebhookEventStatus {
+  PENDING
+  DELIVERED
+  FAILED
+}
+
+// ─── AUDIT LOGS ───────────────────────────────────────────
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  action    String
+  metadata  Json?
+  ipAddress String?
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+}
