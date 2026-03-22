@@ -12,6 +12,7 @@ import { orgRoutes } from "./modules/orgs/routes";
 import { apiKeyRoutes } from './modules/api-keys/routes'
 import apiKeyAuthPlugin from './plugins/apiKeyAuth'
 import rateLimiterPlugin from './plugins/rateLimiter'
+import { WebhookService } from "./modules/webhook/service";
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -64,6 +65,22 @@ export const buildApp = async () => {
   //     message: 'Request successful',
   //     org: request.apiKeyOrg 
   //   }
+  // })
+
+  // // Test webhook service manually - WE SKIPPED THIS WEBHOOK TESTING
+  // app.post('/test-webhook', {
+  //   preHandler: [app.authenticate]
+  // }, async (request, reply) => {
+  //   const webhookService = new WebhookService()
+  //   const { orgId } = request.body as { orgId: string }
+    
+  //   await webhookService.triggerWebhook(
+  //     orgId,
+  //     'org.member_added',
+  //     { userId: 'test_user', role: 'MEMBER', triggeredAt: new Date().toISOString() }
+  //   )
+    
+  //   return reply.status(200).send({ message: 'Webhook triggered' })
   // })
 
   return app;

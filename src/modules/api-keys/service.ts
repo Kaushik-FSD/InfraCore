@@ -1,6 +1,7 @@
 import bcrypt from 'bcrypt'
 import { prisma } from '../../utils/prisma'
 import { Role } from '@prisma/client'
+import { WebhookService } from '../webhook/service'
 
 const SALT_ROUNDS = 10
 
@@ -11,6 +12,8 @@ const generateApiKey = (): { fullKey: string; prefix: string } => {
   const fullKey = `${prefix}_${randomPart}`
   return { fullKey, prefix }
 }
+
+const webhookService = new WebhookService()
 
 export class ApiKeyService {
 
@@ -48,6 +51,12 @@ export class ApiKeyService {
                 orgId,
                 expiresAt: expiresAt ? new Date(expiresAt) : null,
             },
+        })
+
+        await webhookService.triggerWebhook(orgId, 'api_key.created', {
+            keyId: apiKey.id,
+            name: apiKey.name,
+            permissions: apiKey.permissions,
         })
 
         // Return full key ONCE — never retrievable again
@@ -125,6 +134,10 @@ export class ApiKeyService {
             data: { 
                 revokedAt: new Date() 
             },
+        })
+
+        await webhookService.triggerWebhook(orgId, 'api_key.revoked', {
+            keyId,
         })
 
         return { message: 'API key revoked successfully' }

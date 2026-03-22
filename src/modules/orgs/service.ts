@@ -1,7 +1,11 @@
 import { prisma } from "../../utils/prisma"
 import { Role } from "@prisma/client"
+import { WebhookService } from "../webhook/service"
+
+const webhookService = new WebhookService()
 
 export class OrgService {
+
     async createOrg(userId: string, name: string, slug: string) {
 
         const existing = await prisma.organization.findUnique({
@@ -112,6 +116,13 @@ export class OrgService {
             },
         })
 
+        //trigger webhook
+        await webhookService.triggerWebhook(orgId, 'org.member_added', {
+            userId: invitedUser.id,
+            email: invitedUser.email,
+            role,
+        })
+
         return { member }
     }
 
@@ -145,6 +156,11 @@ export class OrgService {
             },
         })
 
+        await webhookService.triggerWebhook(orgId, 'org.member_role_updated', {
+            userId: memberId,
+            role,
+        })
+
         return { member: updated }
     }
 
@@ -174,6 +190,10 @@ export class OrgService {
 
         await prisma.orgMember.delete({
             where: { userId_orgId: { userId: memberId, orgId } },
+        })
+
+        await webhookService.triggerWebhook(orgId, 'org.member_removed', {
+            userId: memberId,
         })
 
         return { message: 'Member removed successfully' }
