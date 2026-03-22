@@ -1,7 +1,9 @@
 import { prisma } from "../../utils/prisma"
 import { Role } from "@prisma/client"
 import { WebhookService } from "../webhook/service"
+import { AuditService } from '../audit/service'
 
+const auditService = new AuditService()
 const webhookService = new WebhookService()
 
 export class OrgService {
@@ -33,7 +35,6 @@ export class OrgService {
                         role: Role.ADMIN,
                     }
                 })
-
                 return newOrg
             }
         )
@@ -41,6 +42,12 @@ export class OrgService {
             return { org }       // returns → { org: { id: '...', name: '...', ... } }
             return org           // returns → { id: '...', name: '...', ... }
         */
+       await auditService.log({
+            action: 'org.created',
+            userId,
+            orgId: org.id,
+            metadata: { name, slug }
+        })
         return { org }
     }
 
@@ -123,6 +130,13 @@ export class OrgService {
             role,
         })
 
+        await auditService.log({
+            action: 'org.member_added',
+            userId: requesterId,
+            orgId,
+            metadata: { invitedUserId: invitedUser.id, role }
+        })
+
         return { member }
     }
 
@@ -194,6 +208,13 @@ export class OrgService {
 
         await webhookService.triggerWebhook(orgId, 'org.member_removed', {
             userId: memberId,
+        })
+
+        await auditService.log({
+            action: 'org.member_removed',
+            userId: requesterId,
+            orgId,
+            metadata: { removedUserId: memberId }
         })
 
         return { message: 'Member removed successfully' }

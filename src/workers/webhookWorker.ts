@@ -56,7 +56,7 @@ const processWebhook = async (job: Job<WebhookJobData>) => {
     throw new Error(`Webhook delivery failed: ${response.status} ${response.statusText}`)
   }
 
-  // Success — mark event as delivered
+  // 200 - Success from api — mark event as delivered
   await prisma.webhookEvent.update({
     where: { id: eventId },
     data: {

@@ -13,6 +13,8 @@ import { apiKeyRoutes } from './modules/api-keys/routes'
 import apiKeyAuthPlugin from './plugins/apiKeyAuth'
 import rateLimiterPlugin from './plugins/rateLimiter'
 import { WebhookService } from "./modules/webhook/service";
+import { auditRoutes } from "./modules/audit/routes";
+import { observabilityRoutes } from "./modules/observability/routes";
 
 export const buildApp = async () => {
     const app = Fastify({
@@ -47,6 +49,8 @@ export const buildApp = async () => {
   await app.register(authRoutes, { prefix: '/auth' }) // Register auth routes with /auth prefix
   await app.register(orgRoutes, { prefix: '/orgs' })
   await app.register(apiKeyRoutes, { prefix: '/orgs' })
+  await app.register(auditRoutes, { prefix: '/orgs' })
+  await app.register(observabilityRoutes)
 
   // app.get('/health', async (request, reply) => {
   //   return { status: 'ok', timestamp: new Date().toISOString() }

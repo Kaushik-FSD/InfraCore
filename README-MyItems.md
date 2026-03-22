@@ -146,3 +146,20 @@ payload:
   "permissions": ["read", "write"],
   "rateLimit": 1000
 }
+
+Full InfraCore:
+
+Project setup — Fastify + TypeScript + folder structure
+Docker — PostgreSQL + Redis
+Prisma 7 — schema, migrations, 7 tables
+Auth module — signup, login, refresh, logout, JWT two-token flow, Redis blacklist
+Error handler — clean consistent error responses
+Auth middleware — JWT protect routes
+API Key middleware — machine auth
+Orgs module — create, get, invite, roles, remove
+API Keys module — generate, list, revoke, verify
+Rate Limiting — per API key, Redis based, 24hr reset
+Webhooks module — register endpoints, trigger events, delivery, list
+BullMQ worker — background delivery, HMAC signing, retry, dead letter
+Audit Logs — automatic action logging, fetch per org
+Observability — metrics endpoint, memory, CPU, uptime
