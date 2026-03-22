@@ -313,33 +313,23 @@ InfraCore implements defense-in-depth across multiple layers:
 ## 🗺 Production Roadmap
 
 **Infrastructure**
-- [ ] CI/CD pipeline with GitHub Actions — lint, type-check, and deploy on push to `main`
-- [ ] GCP Cloud Run deployment — containerized, autoscaling, secrets via Secret Manager
-- [ ] PgBouncer connection pooling — handle high concurrent database connections efficiently
-- [ ] Redis Cluster — high availability cache and queue with automatic failover
+- [ ] CI/CD pipeline with GitHub Actions — automated build and deploy on push to `main`
+- [ ] Cloud deployment (GCP / AWS) — containerized with managed secrets
+- [ ] Database connection pooling — handle concurrent connections at scale
 
 **Security**
-- [ ] Webhook signing secrets encrypted at rest using AES-256
-- [ ] IP allowlisting per API key — restrict keys to known server IPs
 - [ ] Two-factor authentication (TOTP) for user accounts
-- [ ] Automated key rotation reminders via email and webhook notifications
+- [ ] IP allowlisting per API key — restrict keys to known server IPs
+- [ ] Webhook signing secrets encrypted at rest
 
 **Reliability**
-- [ ] Distributed tracing with OpenTelemetry — trace requests end-to-end across services
-- [ ] Webhook event replay endpoint — manually re-deliver failed events without re-triggering
-- [ ] Dead-letter queue dashboard — inspect, debug, and replay failed BullMQ jobs
-- [ ] Database read replicas — separate read and write workloads at scale
-
-**Developer Experience**
-- [ ] OpenAPI/Swagger spec auto-generation from Zod route schemas
-- [ ] Webhook delivery simulator for local development testing
-- [ ] SDK generation from OpenAPI spec (TypeScript + Python)
-- [ ] Email notifications for key expiry and sustained delivery failures
+- [ ] Webhook event replay — manually re-deliver failed events
+- [ ] Dead-letter queue dashboard — inspect and retry failed background jobs
+- [ ] Structured request tracing — correlate logs across services
 
 **AI Insights**
-- [ ] Time-series usage analysis — detect API usage trends over weeks and months
-- [ ] Anomaly detection — automatically flag unusual usage patterns per org
-- [ ] Natural language to SQL — query any org data via plain English
+- [ ] Anomaly detection — automatically flag unusual API usage patterns
+- [ ] Time-series analysis — detect usage trends over weeks and months
 
 ---
 
