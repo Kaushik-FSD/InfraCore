@@ -11,6 +11,28 @@
 
 ---
 
+## What is InfraCore?
+
+InfraCore is a backend infrastructure platform that solves the problem every SaaS product faces before writing a single line of their actual product — building the plumbing.
+
+Every company building a SaaS product needs the same foundational backend layer: user authentication, multi-tenant organization workspaces, API key management for developer integrations, webhook event delivery for real-time notifications, and background job processing for reliability. Instead of rebuilding this from scratch every time, InfraCore provides it as a ready-to-use platform.
+
+---
+
+## What Problem It Solves
+
+When a startup builds a product like a project management tool, they need to solve several infrastructure challenges before writing a single feature:
+
+- **"How do users sign up and stay logged in securely?"** — Auth with JWT tokens, refresh token rotation, and session invalidation
+- **"How do teams collaborate under one account?"** — Multi-tenant organization system with role-based access control
+- **"How do other tools integrate with us?"** — API key generation with scoped permissions and rate limiting
+- **"How do we notify our customers' systems when things happen?"** — Webhook delivery with retry logic and payload signing
+- **"How do we process slow tasks without blocking our API?"** — Background job queue with BullMQ
+
+InfraCore solves all of these, so product teams can focus on what makes their product unique.
+
+---
+
 ## 🏗 High-Level Architecture
 
 InfraCore is designed as a **modular Fastify backend** with strict separation between HTTP layer, business logic, and infrastructure. Every module is self-contained with its own routes, service, and schema — no logic bleeds between modules.
