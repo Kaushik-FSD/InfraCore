@@ -58,7 +58,7 @@ const response = await fetch('https://infracore.com/orgs/org_acme/webhooks/trigg
   },
   body: JSON.stringify({
     event: 'task.created',
-    data: { taskId: '123', title: 'Fix bug' }
+    data: { taskId: '1234', title: 'Fix bug' }
   })
 })
 ```
