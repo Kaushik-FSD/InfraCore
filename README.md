@@ -19,7 +19,7 @@ Every company building a SaaS product needs the same foundational backend layer:
 
 ---
 
-## What Problem It Solves
+## What Problem It Solves ?
 
 When a startup builds a product like a project management tool, they need to solve several infrastructure challenges before writing a single feature:
 
