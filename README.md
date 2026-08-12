@@ -193,7 +193,7 @@ There are no cross-tenant queries anywhere in the codebase. Isolation is enforce
 
 - Node.js v20+
 - Docker Desktop
-- npm
+- node & npm
 
 ### 1. Clone the repository
 
